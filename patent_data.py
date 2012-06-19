@@ -1,9 +1,10 @@
 from statsmodels.iolib.foreign import StataReader
-import sqlalchemy
+from sqlalchemy import create_engine, Table, Column, MetaData, BigInteger, SmallInteger, Integer, String, Float
 
 # sqlite://<nohostname>/<path>
 # where <path> is relative:
 engine = create_engine('sqlite:///patent.db')
+metadata = MetaData()
 
 # http://docs.sqlalchemy.org/en/rel_0_7/core/schema.html#metadata-constraints
 # http://docs.sqlalchemy.org/en/rel_0_7/orm/relationships.html
@@ -11,6 +12,23 @@ engine = create_engine('sqlite:///patent.db')
 # http://docs.sqlalchemy.org/en/rel_0_7/core/tutorial.html
 # http://docs.sqlalchemy.org/en/rel_0_7/orm/extensions/declarative.html
 
+def type_for_dta(typ):
+    type_for_dta = {
+        'h': Integer,
+        'b': SmallInteger,
+        'l': BigInteger,
+        'f': Float,
+        'd': Float
+    }
+    if typ in type_for_dta: return type_for_dta[typ]
+    #else it is an integer, denoting string of a given length
+    return String(typ)
+
+def columns_for_dta(dta):
+    for v in dta.variables():
+        print v.name, v.type, v.label, type_for_dta(v.type)
+        yield Column(v.name, type_for_dta(v.type))
+    
 #This file has one record for each IPC class for each patent. The data description is:
 """
 -------------------------------------------------------------------------------
@@ -39,10 +57,13 @@ uspto_assignee  long   %12.0g                 Original assignee number
 -------------------------------------------------------------------------------
 Sorted by:  patent  pdpass  iclnum
 """
-ipc_data_handle = open('/Users/dan/Dropbox/trade_data/nber_Data/patents/pat76_06_ipc.dta')
-ipc_data =StataReader(ipc_data_handle)
-for v in ipc_data.variables():
-    print v.name, v.type, v.label
+# ipc_data_handle = open('/Users/dan/Dropbox/trade_data/nber_Data/patents/pat76_06_ipc.dta')
+ipc_data_handle = open('/Users/dan/Desktop/researchtmp/pat76_06_ipc.dta')
+ipc_data = StataReader(ipc_data_handle)
+
+ipc = Table('ipc', metadata,
+   *columns_for_dta(ipc_data)
+)
 
 
 #This file has one record for each assignment of each utility patent. Patents that are assigned to more than one party have multiple records. This file lists only the first technology class.
@@ -100,7 +121,8 @@ uspto_assignee  long   %12.0g                 Original assignee number
 -------------------------------------------------------------------------------
 Sorted by:  patent
 """
-assg_data_handle = open('/Users/dan/Dropbox/trade_data/nber_Data/patents/pat76_06_assg.dta')
-assg_data =StataReader(assg_data_handle)
-for v in ipc_data.variables():
-    print v.name, v.type, v.label
+# assg_data_handle = open('/Users/dan/Dropbox/trade_data/nber_Data/patents/pat76_06_assg.dta')
+assg_data_handle = open('/Users/dan/Desktop/researchtmp/pat76_06_assg.dta')
+assg_data = StataReader(assg_data_handle)
+
+metadata.create_all(engine)
