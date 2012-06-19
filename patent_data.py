@@ -1,5 +1,7 @@
+from __future__ import division
+import sys
 from statsmodels.iolib.foreign import StataReader
-from sqlalchemy import create_engine, Table, Column, MetaData, BigInteger, SmallInteger, Integer, String, Float
+from sqlalchemy import create_engine, Table, Column, MetaData, BigInteger, SmallInteger, Integer, String, Float, Sequence
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -44,26 +46,24 @@ uspto_assignee  long   %12.0g                 Original assignee number
 -------------------------------------------------------------------------------
 Sorted by:  patent  pdpass  iclnum
 """
-# ipc_data_handle = open('/Users/dan/Dropbox/trade_data/nber_Data/patents/pat76_06_ipc.dta')
-ipc_data_handle = open('/Users/dan/Desktop/researchtmp/pat76_06_ipc.dta')
-ipc_data = StataReader(ipc_data_handle)
 
 class Ipc(Base):
     __tablename__='ipc'
+    id = Column(Integer, Sequence('ipc_id_seq'), primary_key=True, autoincrement=True)
     appyear = Column(Integer)
     cat = Column(SmallInteger)
     gyear = Column(SmallInteger)
-    icl = Column(String(18), primary_key=True)
+    icl = Column(String(18), index=True)
     icl_class = Column(String(4))
     icl_maingroup = Column(Float)
     iclnum = Column(SmallInteger)
     nclass = Column(Integer)
     numipc = Column(SmallInteger)
-    patent = Column(BigInteger)
+    patent = Column(BigInteger, index=True)
     pdpass = Column(BigInteger)
     subcat = Column(SmallInteger)
     subclass = Column(Float)
-    uspto_assignee = Column(BigInteger)
+    uspto_assignee = Column(BigInteger, index=True)
 
 #This file has one record for each assignment of each utility patent. Patents that are assigned to more than one party have multiple records. This file lists only the first technology class.
 """
@@ -120,13 +120,69 @@ uspto_assignee  long   %12.0g                 Original assignee number
 -------------------------------------------------------------------------------
 Sorted by:  patent
 """
-# assg_data_handle = open('/Users/dan/Dropbox/trade_data/nber_Data/patents/pat76_06_assg.dta')
-# assg_data_handle = open('/Users/dan/Desktop/researchtmp/pat76_06_assg.dta')
-# assg_data = StataReader(assg_data_handle)
-# 
+
+class Assignment(Base):
+    __tablename__='assg'
+    id = Column(Integer, Sequence('assg_id_seq'), primary_key=True, autoincrement=True)
+    allcites = Column(Integer)
+    appyear = Column(Integer)
+    asscode = Column(SmallInteger)
+    assgnum = Column(Integer)
+    cat = Column(SmallInteger)
+    cat_ocl = Column(SmallInteger)
+    cclass = Column(String(11))
+    country = Column(String(2))
+    ddate = Column(Float)
+    gday = Column(SmallInteger)
+    gmonth = Column(SmallInteger)
+    gyear = Column(SmallInteger)
+    hjtwt = Column(Float)
+    icl = Column(String(18), index=True)
+    icl_class = Column(String(4))
+    icl_maingroup = Column(Float)
+    iclnum = Column(SmallInteger)
+    nclaims = Column(Integer)
+    nclass = Column(Integer)
+    nclass_ocl = Column(Integer)
+    patent = Column(BigInteger, index=True)
+    pdpass = Column(BigInteger,index=True)
+    state = Column(String(2))
+    status = Column(String(1))
+    subcat = Column(SmallInteger)
+    subcat_ocl = Column(SmallInteger)
+    subclass = Column(Float)
+    subclass1 = Column(String(9))
+    subclass1_ocl = Column(String(9))
+    subclass_ocl = Column(Float)
+    term_extension = Column(Integer)
+    uspto_assignee = Column(BigInteger, index=True)
+
 Base.metadata.create_all()
 
-for stata_rec in ipc_data.dataset(as_dict=True):
-    print stata_rec['icl']
-    db_rec = Ipc(**stata_rec)
-    session.add(db_rec)
+def main():
+    global ipc_data, assg_data
+    # ipc_data_handle = open('/Users/dan/Dropbox/trade_data/nber_Data/patents/pat76_06_ipc.dta')
+    ipc_data_handle = open('/Users/dan/Desktop/researchtmp/pat76_06_ipc.dta')
+    ipc_data = StataReader(ipc_data_handle)
+    n_recs = len(ipc_data)
+
+    for i, stata_rec in enumerate(ipc_data.dataset(as_dict=True)):
+        db_rec = Ipc(**stata_rec)
+        session.add(db_rec)
+        if (i % 10000) == 0:
+            session.commit()
+            print "assg: %f%%" % (100.0*i/n_recs)
+
+    # assg_data_handle = open('/Users/dan/Dropbox/trade_data/nber_Data/patents/pat76_06_assg.dta')
+    assg_data_handle = open('/Users/dan/Desktop/researchtmp/pat76_06_assg.dta')
+    assg_data = StataReader(assg_data_handle)
+    n_recs = len(assg_data)
+
+    for i, stata_rec in enumerate(assg_data.dataset(as_dict=True)):
+        print i, stata_rec['pdpass']
+        db_rec = Assignment(**stata_rec)
+        session.add(db_rec)
+        if (i % 10000) == 0:
+            session.commit()
+            print "assg: %f%%" % (100.0*i/n_recs)
+
