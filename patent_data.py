@@ -1,13 +1,11 @@
 from statsmodels.iolib.foreign import StataReader
 from sqlalchemy import create_engine, Table, Column, MetaData, BigInteger, SmallInteger, Integer, String, Float
-from sqlalchemy.orm import mapper
+from sqlalchemy.ext.declarative import declarative_base
 
 # sqlite://<nohostname>/<path>
 # where <path> is relative:
-engine = create_engine('sqlite:///patent.db')
-metadata = MetaData()
-# bind to an engine
-metadata.bind = engine
+Base = declarative_base(bind = create_engine('sqlite:///patent.db'))
+
 # http://docs.sqlalchemy.org/en/rel_0_7/core/schema.html#metadata-constraints
 # http://docs.sqlalchemy.org/en/rel_0_7/orm/relationships.html
 # http://docs.sqlalchemy.org/en/rel_0_7/orm/tutorial.html
@@ -26,10 +24,10 @@ def type_for_dta(typ):
     #else it is an integer, denoting string of a given length
     return String(typ)
 
-def columns_for_dta(dta):
+def columns_for_dta(dta, primary):
     for v in dta.variables():
         print v.name, v.type, v.label, type_for_dta(v.type)
-        yield Column(v.name, type_for_dta(v.type))
+        yield v.name, Column(v.name, type_for_dta(v.type), primary_key = True if v.name in primary else None)
     
 #This file has one record for each IPC class for each patent. The data description is:
 """
@@ -63,12 +61,27 @@ Sorted by:  patent  pdpass  iclnum
 ipc_data_handle = open('/Users/dan/Desktop/researchtmp/pat76_06_ipc.dta')
 ipc_data = StataReader(ipc_data_handle)
 
-ipc = Table('ipc', metadata,
-   *columns_for_dta(ipc_data)
-)
-class Ipc:pass
-mapper(Ipc,ipc)
+class Ipc(Base):
+    __tablename__='ipc'
+    # appyear = Column(Integer)
+    # cat = Column(SmallInteger)
+    # gyear = Column(SmallInteger)
+    # icl = Column(String(18), primary_key=True)
+    # icl_class = Column(String(4))
+    # icl_maingroup = Column(Float)
+    # iclnum = Column(SmallInteger)
+    # nclass = Column(Integer)
+    # numipc = Column(SmallInteger)
+    # patent = Column(BigInteger)
+    # pdpass = Column(BigInteger)
+    # subcat = Column(SmallInteger)
+    # subclass = Column(Float)
+    # uspto_assignee = Column(BigInteger)
 
+for name, col in columns_for_dta(ipc_data, primary= ['icl']):
+    setattr(Ipc, name, col)
+
+    
 #This file has one record for each assignment of each utility patent. Patents that are assigned to more than one party have multiple records. This file lists only the first technology class.
 """
 -------------------------------------------------------------------------------
