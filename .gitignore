@@ -29,3 +29,6 @@ pip-log.txt
 #R shit
 .Rhistory
 .RData
+
+#project-specific stuff
+patent.db
