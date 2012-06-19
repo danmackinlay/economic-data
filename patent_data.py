@@ -1,11 +1,13 @@
 from statsmodels.iolib.foreign import StataReader
 from sqlalchemy import create_engine, Table, Column, MetaData, BigInteger, SmallInteger, Integer, String, Float
+from sqlalchemy.orm import mapper
 
 # sqlite://<nohostname>/<path>
 # where <path> is relative:
 engine = create_engine('sqlite:///patent.db')
 metadata = MetaData()
-
+# bind to an engine
+metadata.bind = engine
 # http://docs.sqlalchemy.org/en/rel_0_7/core/schema.html#metadata-constraints
 # http://docs.sqlalchemy.org/en/rel_0_7/orm/relationships.html
 # http://docs.sqlalchemy.org/en/rel_0_7/orm/tutorial.html
@@ -64,7 +66,8 @@ ipc_data = StataReader(ipc_data_handle)
 ipc = Table('ipc', metadata,
    *columns_for_dta(ipc_data)
 )
-
+class Ipc:pass
+mapper(Ipc,ipc)
 
 #This file has one record for each assignment of each utility patent. Patents that are assigned to more than one party have multiple records. This file lists only the first technology class.
 """
@@ -122,7 +125,7 @@ uspto_assignee  long   %12.0g                 Original assignee number
 Sorted by:  patent
 """
 # assg_data_handle = open('/Users/dan/Dropbox/trade_data/nber_Data/patents/pat76_06_assg.dta')
-assg_data_handle = open('/Users/dan/Desktop/researchtmp/pat76_06_assg.dta')
-assg_data = StataReader(assg_data_handle)
-
-metadata.create_all(engine)
+# assg_data_handle = open('/Users/dan/Desktop/researchtmp/pat76_06_assg.dta')
+# assg_data = StataReader(assg_data_handle)
+# 
+metadata.create_all()
