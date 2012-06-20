@@ -156,6 +156,32 @@ class Assignment(Base):
     subclass_ocl = Column(Float)
     term_extension = Column(Integer)
     uspto_assignee = Column(BigInteger, index=True)
+    
+"""
+Patent classification:
+
+The USPTO changes its classification system from time to time to accommodate 
+the growth in new technologies, adding classes, and occasionally deleting old 
+classes if they become too full (creating a whole new set of classes to replace 
+them).
+
+The variables designated "OCL" are based on the original classification at the 
+time the patent was examined and issued (the field of search shown on the USPTO 
+website). Therefore the classificaiton system used will vary across the patents 
+in the file according to their vintage.
+
+The variables designated "CCL" are based on the USPTO classification system as 
+of 2008. This means that all the patents on this file will have a consistent 
+classification applied if you use the ccl variables. The category and 
+subcategory assignments are listed in this spreadsheet. Note that the 
+categories do not fully correspond to early technology classes (such as 2006 or 
+nclass) because, of course, the USPTO continually revises the technology 
+classes.
+
+IPC codes are assigned via a concordance from the USPTO codes. The USPC to IPC 
+Concordance is based on the International Patent Classification Eighth Edition 
+(please see note at the bottom of this page ).
+"""
 
 Base.metadata.create_all()
 
@@ -171,7 +197,7 @@ def main():
         session.add(db_rec)
         if (i % 10000) == 0:
             session.commit()
-            print "assg: %f%%" % (100.0*i/n_recs)
+            print "ipc: %f%%" % (100.0*i/n_recs)
 
     # assg_data_handle = open('/Users/dan/Dropbox/trade_data/nber_Data/patents/pat76_06_assg.dta')
     assg_data_handle = open('/Users/dan/Desktop/researchtmp/pat76_06_assg.dta')
@@ -179,7 +205,6 @@ def main():
     n_recs = len(assg_data)
 
     for i, stata_rec in enumerate(assg_data.dataset(as_dict=True)):
-        print i, stata_rec['pdpass']
         db_rec = Assignment(**stata_rec)
         session.add(db_rec)
         if (i % 10000) == 0:
