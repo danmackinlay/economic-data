@@ -32,3 +32,4 @@ pip-log.txt
 
 #project-specific stuff
 patent.db
+*_local_settings.py

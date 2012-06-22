@@ -4,10 +4,11 @@ from statsmodels.iolib.foreign import StataReader
 from sqlalchemy import create_engine, Table, Column, MetaData, BigInteger, SmallInteger, Integer, String, Float, Sequence
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from patent_local_settings import DB_URL
 
 # sqlite://<nohostname>/<path>
 # where <path> is relative:
-engine = create_engine('sqlite:///patent.db')
+engine = create_engine(DB_URL)
 Base = declarative_base(bind=engine)
 Session = sessionmaker(bind=engine)
 session = Session()
