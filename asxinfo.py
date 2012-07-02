@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-"""From view-source:http://www.asx.com.au/asx/research/companyInfo.do we know that these are the GICS codes lised on the ASX."""
+"""From http://www.asx.com.au/asx/research/companyInfo.do we know that these are the GICS codes lised on the ASX."""
 
 ASX_INDUSTRIES = {
     "1010": "Energy",
@@ -32,28 +32,28 @@ ASX_INDUSTRIES = {
 
 """For each GICS code we may extract a list of appropriate companies at a URL like
 http://www.asx.com.au/asx/research/companyInfo.do?by=industryGroup&industryGroup=2530
-Then we look for a lsit of companies ina a "select" field named "asxCode".
+Then we look for a list of companies ina a "select" field named "asxCode".
 """
 GICS_URL_TEMPLATE = "http://www.asx.com.au/asx/research/companyInfo.do?by=industryGroup&industryGroup=%s"
 
-industries = {}
+ALL_INDUSTRY_FIRMS = {}
 
 def get_codes():
-    global industries
+    global ALL_INDUSTRY_FIRMS
     for gics_code in ASX_INDUSTRIES.keys():
         companies = {}
         r = requests.get(GICS_URL_TEMPLATE % gics_code)
         bs=BeautifulSoup(r.content)
         company_fields = bs.find("select", {'name':"asxCode"}).findAll("option")
-        # Note that at the moment this doesn't regex out the weird company texrt that ACTUALLY looks like, e.g.
-        #'EPX': u'(ETHANE PIPELINE)\xa0EPX\xa0\xa0',
+        # Note that at the moment this doesn't regex out the weird company text that ACTUALLY looks like, e.g.
+        #'EPX': u'(ETHANE PIPELINE)',
         
         for company in company_fields:
             companies[company.attrs['value']] = company.text
-        industries[gics_code] = companies
-    return industries
+        ALL_INDUSTRY_FIRMS[gics_code] = companies
+    return ALL_INDUSTRY_FIRMS
 
-industries = \
+ALL_INDUSTRY_FIRMS = \
 {'1010': {'AAE': u'AGRI ENERGY LIMITED',
           'AAL': u'APAC COAL',
           'ACB': u'A-CAP RESOURCES',
@@ -1170,10 +1170,10 @@ industries = \
           'RWH': u'ROYAL WOLF HOLDINGS',
           'SAV': u'SAVCOR GROUP LIMITED',
           'SDM': u'SEDGMAN LIMITED',
-          'SHR': u'(SHEARER (JOHN) HLDGS)\xa0SHR\xa0\xa0',
+          'SHR': u'(SHEARER (JOHN) HLDGS)',
           'SIT': u'SITE GROUP INT LTD',
           'SIV': u'SILVER CHEF LIMITED',
-          'SKS': u'(STOKES (AUSTRALASIA))\xa0SKS\xa0\xa0',
+          'SKS': u'(STOKES (AUSTRALASIA))',
           'SLE': u'SINO-EXCEL ENERGY',
           'SND': u'SAUNDERS INTL LTD',
           'SRH': u'SAFEROADS HOLDINGS',
@@ -1310,7 +1310,7 @@ industries = \
           'ISK': u'ISLAND SKY AUSTRALIA',
           'KFG': u'KINGFORM HEALTH HOME',
           'KRS': u'KRESTA HOLDINGS',
-          'MCP': u"(MCPHERSON'S LTD)\xa0MCP\xa0\xa0",
+          'MCP': u"(MCPHERSON'S LTD)",
           'MES': u'MESBON CHINA NYLON',
           'MHI': u'MERCHANT HOUSE',
           'PTO': u'PTO CONSOLIDATED LTD',
@@ -1713,7 +1713,7 @@ industries = \
           'HLS': u'HILLCREST LITIGAT.',
           'IBC': u'IRONBARK CAPITAL LTD',
           'IFL': u'IOOF HOLDINGS LTD',
-          'IMF': u'(IMF (AUSTRALIA) LTD)\xa0IMF\xa0\xa0',
+          'IMF': u'(IMF (AUSTRALIA) LTD)',
           'INQ': u'INVESTORFIRST LTD',
           'IPA': u'INDIGO PROP AUS LTD',
           'IPC': u'IMPERIAL PACIFIC LTD',
@@ -1756,7 +1756,7 @@ industries = \
           'SFN': u'STANFIELD FUNDS LTD',
           'SFW': u'SFG AUSTRALIA LTD',
           'SGI': u'SIGNATURE CAP LTD',
-          'SOL': u'(SOUL PATTINSON (W.H))\xa0SOL\xa0\xa0',
+          'SOL': u'(SOUL PATTINSON (W.H))',
           'SOR': u'STRATEGIC ELEMENTS',
           'SPD': u'STRATEGIC POOLED',
           'SVS': u'SUNVEST CORPORATION',
@@ -1801,7 +1801,7 @@ industries = \
           'AJO': u'ARMSTRONG JONES OFF.',
           'ALZ': u'AUSTRALAND PROPERTY',
           'APZ': u'ASPEN GROUP',
-          'ARJ': u'(ARK FUND LTD (THE))\xa0ARJ\xa0\xa0',
+          'ARJ': u'(ARK FUND LTD (THE))',
           'AUP': u'AURORA PROPERTY',
           'AVJ': u'AVJENNINGS LIMITED',
           'AXI': u'AXIOM PROPERTIES',
@@ -1950,7 +1950,7 @@ industries = \
           'PPS': u'PRAEMIUM LIMITED',
           'PRO': u'PROPHECY INTERNATION',
           'PSY': u'PANORAMA SYNERGY LTD',
-          'QIL': u'(QUOIN (INT) LIMITED.)\xa0QIL\xa0\xa0',
+          'QIL': u'(QUOIN (INT) LIMITED.)',
           'QNA': u'QANDA TECH LTD',
           'RDF': u'REDFLEX HOLDINGS',
           'RFL': u'RUBIK FINANCIAL LTD.',
