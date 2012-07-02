@@ -163,13 +163,12 @@ def get_time_series(firm_code):
         reader = csv.reader(f)
         for row in reader:
             yield row
-    
+
 def get_cache_file_name(firm_code):
     return os.path.join(EQUITY_CACHE_DIR, firm_code + ".csv")
 
 def fetch_and_cache(firm_code):
     stock_data_request = requests.get(YAHOO_URL_TEMPLATE % firm_code)
-    import pdb; pdb.set_trace()
     cache_file_name = get_cache_file_name(firm_code)
     with open(cache_file_name, 'w') as cache_file:
         cache_file.write(stock_data_request.content)
