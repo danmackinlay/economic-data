@@ -8,6 +8,9 @@ http://ichart.finance.yahoo.com/table.csv?d=6&e=1&f=2012&g=d&a=7&b=19&c=2003&ign
 
 import requests
 import csv
+import os.path
+import gzip
+from settings import EQUITY_CACHE_DIR
 
 YAHOO_URL_TEMPLATE = "http://ichart.finance.yahoo.com/table.csv?d=6&e=1&f=2012&g=d&a=7&b=19&c=2003&ignore=.csv&s=%s.AX"
 
@@ -36,7 +39,7 @@ FAVOURITE_FIRMS = \
           'CLX': u'CTI LOGISTICS',
           'QAN': u'QANTAS AIRWAYS',
           'QRN': u'QR NATIONAL LIMITED',
-          'SYD': u'SYD AIRPORT',}
+          'SYD': u'SYD AIRPORT',},
  '2510': {'ION': u'ION LIMITED',
           'OEC': u'ORBITAL CORP LIMITED',},
  '2520': {'BBG': u'BILLABONG',
@@ -82,7 +85,7 @@ FAVOURITE_FIRMS = \
           'CCL': u'COCA-COLA AMATIL',
           'ELD': u'ELDERS LIMITED',
           'GFF': u'GOODMAN FIELDER.',},
- '3030': {'BKL': u'BLACKMORES LIMITED'},},
+ '3030': {'BKL': u'BLACKMORES LIMITED'},
  '3510': {'ANN': u'ANSELL LIMITED',
           'FPH': u'FISHER & PAYKEL H.',
           'OMI': u'OMI HOLDINGS LIMITED',
@@ -141,3 +144,35 @@ FAVOURITE_FIRMS = \
           'HRL': u'HOT ROCK LIMITED',}
 }
 
+def get_time_series_file(firm_code):
+    cache_file_name = get_cache_file_name(firm_code)
+    if not os.path.exists(cache_file_name):
+        fetch_and_cache(firm_code)
+    return cache_file_name
+
+def get_time_series(firm_code):
+    with open(get_time_series_file(firm_code), 'rb') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            yield row
+    
+def get_cache_file_name(firm_code):
+    return os.path.join(EQUITY_CACHE_DIR, firm_code + ".csv")
+
+def fetch_and_cache(firm_code):
+    stock_data_request = requests.get(YAHOO_URL_TEMPLATE % firm_code)
+    import pdb; pdb.set_trace()
+    cache_file_name = get_cache_file_name(firm_code)
+    with open(cache_file_name, 'w') as cache_file:
+        cache_file.write(stock_data_request.content)
+
+def refresh_favourites_cache():
+    for category, firm_dict in FAVOURITE_FIRMS.iteritems():
+        for firm_code in firm_dict:
+            refresh_cache(firm_code)
+
+def refresh_all_cache():
+    import asxinfo
+    for category, firm_dict in asxinfo.ALL_INDUSTRY_FIRMS.iteritems():
+        for firm_code in firm_dict:
+            refresh_cache(firm_code)
