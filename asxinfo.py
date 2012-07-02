@@ -1,5 +1,4 @@
 import requests
-from bs4 import BeautifulSoup
 
 """From http://www.asx.com.au/asx/research/companyInfo.do we know that these are the GICS codes lised on the ASX."""
 
@@ -39,6 +38,8 @@ GICS_URL_TEMPLATE = "http://www.asx.com.au/asx/research/companyInfo.do?by=indust
 ALL_INDUSTRY_FIRMS = {}
 
 def get_codes():
+    from bs4 import BeautifulSoup
+    
     global ALL_INDUSTRY_FIRMS
     for gics_code in ASX_INDUSTRIES.keys():
         companies = {}
