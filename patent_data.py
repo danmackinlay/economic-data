@@ -6,8 +6,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from patent_local_settings import DB_URL
 
-# sqlite://<nohostname>/<path>
-# where <path> is relative:
+# for f in  ~/Dropbox/trade_data/nber_Data/patents/{assignee,dynass,patassg,pdpcohdr}.dta.zip; do unzip $f; done
+
 engine = create_engine(DB_URL)
 Base = declarative_base(bind=engine)
 Session = sessionmaker(bind=engine)
