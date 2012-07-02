@@ -20,7 +20,7 @@ import os.path
 import gzip
 from settings import EQUITY_CACHE_DIR
 
-YAHOO_URL_TEMPLATE = "http://ichart.finance.yahoo.com/table.csv?d=6&e=1&f=2012&g=d&a=7&b=19&c=2003&ignore=.csv&s=%s.AX"
+YAHOO_URL_TEMPLATE = "http://ichart.finance.yahoo.com/table.csv?d=6&e=1&f=2012&g=d&a=1&b=1&c=2003&ignore=.csv&s=%s.AX"
 
 FAVOURITE_FIRMS = \
 {'1010': {
@@ -152,17 +152,19 @@ FAVOURITE_FIRMS = \
           'HRL': u'HOT ROCK LIMITED',}
 }
 
+
+def get_time_series(firm_code):
+    """This is the iterator you usually wish to call"""
+    with gzip.open(get_time_series_file(firm_code), 'rb') as f:
+        reader = csv.reader(f, quoting=csv.QUOTE_NONE)
+        for row in reader:
+            yield row
+
 def get_time_series_file(firm_code):
     cache_file_name = get_cache_file_name(firm_code)
     if not os.path.exists(cache_file_name):
         fetch_and_cache(firm_code)
     return cache_file_name
-
-def get_time_series(firm_code):
-    with open(get_time_series_file(firm_code), 'rb') as f:
-        reader = csv.reader(f)
-        for row in reader:
-            yield row
 
 def get_cache_file_name(firm_code):
     return os.path.join(EQUITY_CACHE_DIR, firm_code + ".csv")
@@ -176,10 +178,10 @@ def fetch_and_cache(firm_code):
 def refresh_favourites_cache():
     for category, firm_dict in FAVOURITE_FIRMS.iteritems():
         for firm_code in firm_dict:
-            refresh_cache(firm_code)
+            fetch_and_cache(firm_code)
 
 def refresh_all_cache():
     import asxinfo
     for category, firm_dict in asxinfo.ALL_INDUSTRY_FIRMS.iteritems():
         for firm_code in firm_dict:
-            refresh_cache(firm_code)
+            fetch_and_cache(firm_code)
