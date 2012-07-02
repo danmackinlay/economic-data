@@ -4,6 +4,14 @@ http://www.asx.com.au/asx/research/companyInfo.do
 
 Here is the format of Yahoo Finance downloads by category:
 http://ichart.finance.yahoo.com/table.csv?d=6&e=1&f=2012&g=d&a=7&b=19&c=2003&ignore=.csv&s=ASX.AX
+
+TODO:
+
+* Think about foriegn exchanges' data, not just ASX
+* what to do with missing data (so far, only companies that did not yet exist or folded)
+* gzip data to save space
+* return just a 2-column data set.
+* how to represent dates? Ints, preferably.
 """
 
 import requests
