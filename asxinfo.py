@@ -43,7 +43,7 @@ def get_codes():
     for gics_code in ASX_INDUSTRIES.keys():
         companies = {}
         r = requests.get(GICS_URL_TEMPLATE % gics_code)
-        bs=BeautifulSoup(r.content)
+        bs=BeautifulSoup(r.text)
         company_fields = bs.find("select", {'name':"asxCode"}).findAll("option")
         # Note that at the moment this doesn't regex out the weird company text that ACTUALLY looks like, e.g.
         #'EPX': u'(ETHANE PIPELINE)',
