@@ -167,12 +167,12 @@ def get_time_series_file(firm_code):
     return cache_file_name
 
 def get_cache_file_name(firm_code):
-    return os.path.join(EQUITY_CACHE_DIR, firm_code + ".csv")
+    return os.path.join(EQUITY_CACHE_DIR, firm_code + ".csv.gz")
 
 def fetch_and_cache(firm_code):
     stock_data_request = requests.get(YAHOO_URL_TEMPLATE % firm_code)
     cache_file_name = get_cache_file_name(firm_code)
-    with open(cache_file_name, 'w') as cache_file:
+    with gzip.open(cache_file_name, 'wb') as cache_file:
         cache_file.write(stock_data_request.content)
 
 def refresh_favourites_cache():
