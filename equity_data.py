@@ -152,6 +152,20 @@ FAVOURITE_FIRMS = \
           'HRL': u'HOT ROCK LIMITED',}
 }
 
+def get_time_series_as_data_frame(firm_code):
+    from pandas import DataFrame
+    data_iter = get_time_series(firm_code)
+    #pop header row.
+    data_iter.next()
+    return DataFrame.from_records(
+        [
+            dict([
+                ('date', rec[0]),
+                ('volume', int(rec[-2])),
+                ('adj_price', float(rec[-1]))
+            ]) for rec in data_iter
+        ],
+        index='date')
 
 def get_time_series(firm_code):
     """This is the iterator you usually wish to call"""
