@@ -12,6 +12,7 @@ TODO:
 * gzip data to save space
 * return just a 2-column data set.
 * how to represent dates? Ints, preferably.
+* check response code and discard stuff that is just an error message
 """
 
 import requests
@@ -151,6 +152,54 @@ FAVOURITE_FIRMS = \
  '5510': {'AGK': u'AGL ENERGY LIMITED',
           'HRL': u'HOT ROCK LIMITED',}
 }
+
+MISSING_EQUITIES =  [
+    "AAZ", 
+    "AHJ", 
+    "AIQ", 
+    "AYB", 
+    "BCR", 
+    "BCS", 
+    "BHG", 
+    "BWF", 
+    "CBK", 
+    "CFY", 
+    "CJG", 
+    "CNC", 
+    "CNG", 
+    "CRV", 
+    "CSJ", 
+    "CUI", 
+    "DDF", 
+    "DIT", 
+    "DOT", 
+    "DXR", 
+    "EHG", 
+    "EHR", 
+    "GOL", 
+    "IDP", 
+    "MGI", 
+    "MGM", 
+    "MXU", 
+    "MZU", 
+    "NER", 
+    "PSC", 
+    "SBK", 
+    "SDT", 
+    "SWA", 
+    "TPA", 
+    "TSO", 
+    "VCL", 
+    "VEL", 
+    "WFA", 
+    "WFT", 
+    "WSA", 
+    "WSE", 
+    "WSF", 
+    "ZBI", 
+    "ZRI", 
+]
+
 
 def get_time_series_as_data_frame(firm_code):
     from pandas import DataFrame
