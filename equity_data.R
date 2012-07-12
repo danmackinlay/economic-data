@@ -65,24 +65,24 @@ pairwise.granger.test = function(equities, order=1) {
   fs = vector(mode='numeric', length = n.pairs)
   ps = vector(mode='numeric', length = n.pairs)
   i = 0
-  for(j in 1:n) {
-    for(k in (j+1):(n-1)) {
+  for(j in 1:(n-1)) {
+    for(k in (j+1):(n)) {
       left.name = equity.names[j]
       right.name = equity.names[k]
       print(c(left.name, right.name))
-      lefts[i] = left.name
-      rights[i] = right.name
       res = granger.fp(equities, left.name, right.name, order)
       if(!is.null(res)) {
         i = i+1
+        lefts[i] = left.name
+        rights[i] = right.name
         fs[i] = res$F
         ps[i] = res$P
       }
-      lefts[i] = right.name
-      rights[i] = left.name
       res = granger.fp(equities, right.name, left.name, order)
       if(!is.null(res)) {
         i = i+1
+        lefts[i] = right.name
+        rights[i] = left.name
         fs[i] = res$F
         ps[i] = res$P
       }
