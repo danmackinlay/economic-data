@@ -28,7 +28,7 @@ FAVOURITE_FIRMS = \
           'ORG': u'ORIGIN ENERGY',
           'RRS': u'RANGE RESOURCES LTD',
           'RUM': u'RUM JUNGLE RES',},
- '1510': {#'AAI': u'ALCOA INC.', #no data!
+ '1510': {'AAI': u'ALCOA INC.',
           'BHP': u'BHP BILLITON LIMITED',
           'CYU': u'CHINALCO YUNNAN',
           'EAU': u'ELDORADO GOLD CORP',
