@@ -11,7 +11,6 @@ get.favourite.indices = function (limit=10) {
   i=0
 
   equities = data.frame()
-  equity.tickers = list()
 
   for (file.name in files) {
     ticker.name = substr(file.name, 1, 3)
@@ -20,9 +19,7 @@ get.favourite.indices = function (limit=10) {
     if(i>limit) {break}
     
     i=i+1
-    
-    append(equity.tickers, ticker.name)
-  
+      
     one.equity = read.csv(gzfile(paste(base.path, file.name, sep = "")))
     trimmed.equity = one.equity[c("Date")]
     trimmed.equity[ticker.name] = log(one.equity["Adj.Close"])
