@@ -22,7 +22,11 @@ get.favourite.indices = function (limit=10) {
       
     one.equity = read.csv(gzfile(paste(base.path, file.name, sep = "")))
     trimmed.equity = one.equity[c("Date")]
-    trimmed.equity[ticker.name] = log(one.equity["Adj.Close"])
+    #take max because some share trade at 0 (granularity is $0.01, zero is -4.61)
+    trimmed.equity[ticker.name] = log(pmax(
+      one.equity["Adj.Close"],
+      0.005))
+    
     equities = merge(equities, trimmed.equity, all.x=TRUE, all.y=TRUE)
   }
   equities$Date = as.Date(equities$Date)
