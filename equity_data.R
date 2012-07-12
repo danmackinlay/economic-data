@@ -46,6 +46,13 @@ get.ts = function(equities, ticker.name) {
   return(zoo(equities[,ticker.name], equities$Date))
 }
 
+granger.fp = function(data, xname, yname, order){
+  res = grangertest(data[,xname], data[,yname], order=order)
+  f = res[2, "F"]
+  p = res[2, "Pr(>F)"]
+  return(list(F=f, P=p))
+}
+
 pairwise.granger.test = function(equities, order=1) {
   equity.names = names(equities)[-1]
   n = length(equity.names)
@@ -60,22 +67,19 @@ pairwise.granger.test = function(equities, order=1) {
     for(k in (j+1):n) {
       left.name = equity.names[j]
       right.name = equity.names[k]
-      left.equity = get.ts(equities, left.name)
-      right.equity = get.ts(equities, right.name)
       print(c(left.name, right.name))
       i = i+1
       lefts[i] = left.name
       rights[i] = right.name
-      res = grangertest(left.equity, right.equity, order=order)
-      fs[i] = res[2, "F"]
-      ps[i] = res[2, "Pr(>F)"]
+      res = granger.fp(equities, left.name, right.name, order)
+      fs[i] = res$F
+      ps[i] = res$P
       i = i+1
       lefts[i] = right.name
       rights[i] = left.name
-      res = grangertest(right.equity, left.equity, order=order)
-      fs[i] = res[2, "F"]
-      ps[i] = res[2, "Pr(>F)"]
-      
+      res = granger.fp(equities, right.name, left.name, order)
+      fs[i] = res$F
+      ps[i] = res$P      
     }
   }
   return(data.frame(left=lefts, right=rights, F=fs, P=ps))
