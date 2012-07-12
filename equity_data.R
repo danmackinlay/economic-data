@@ -42,12 +42,31 @@ get.favourite.indices = function (limit=10) {
 # grangertest(AAT ~ AAY, data=equities)
 # so we go for time series
 
-get.ts.from.equities = function(equities, ticker.name) {
+get.ts = function(equities, ticker.name) {
   return(zoo(equities[,ticker.name], equities$Date))
 }
 
-get.all.granger.test = function(equities) {
-  n.equities = length(names(equities)) - 1
-  n.pairs = n(n-1)/2
+pairwise.granger.test = function(equities, order=1) {
+  equity.names = names(equities)[-1]
+  n = length(equity.names)
+  n.pairs = n*(n-1)
+  relations = data.frame
+  lefts = vector(mode='character', length = n.pairs)
+  rights = vector(mode='character', length = n.pairs)
+  fs = vector(mode='numeric', length = n.pairs)
+  ps = vector(mode='numeric', length = n.pairs)
+  i = 0
   
+  for(left.name in equity.names) {
+    for(right.name in equity.names) {
+      i = i+1
+      lefts[i] = left.name
+      rights[i] = right.name
+      print(c(left.name, right.name))
+      res = grangertest(get.ts(equities, left.name), get.ts(equities, right.name), order=order)
+      fs[i] = res[2, "F"]
+      ps[i] = res[2, "Pr(>F)"]
+    }
+  }
+  return(data.frame(left=lefts, right=rights, F=fs, P=ps))
 }
