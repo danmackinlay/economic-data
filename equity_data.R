@@ -47,7 +47,9 @@ get.ts = function(equities, ticker.name) {
 }
 
 granger.fp = function(data, xname, yname, order){
-  res = grangertest(data[,xname], data[,yname], order=order)
+  res = NULL
+  error = try(res <- grangertest(data[,xname], data[,yname], order=order))
+  if(is.null(res)) return(NULL)
   f = res[2, "F"]
   p = res[2, "Pr(>F)"]
   return(list(F=f, P=p))
@@ -64,22 +66,26 @@ pairwise.granger.test = function(equities, order=1) {
   ps = vector(mode='numeric', length = n.pairs)
   i = 0
   for(j in 1:n) {
-    for(k in (j+1):n) {
+    for(k in (j+1):(n-1)) {
       left.name = equity.names[j]
       right.name = equity.names[k]
       print(c(left.name, right.name))
-      i = i+1
       lefts[i] = left.name
       rights[i] = right.name
       res = granger.fp(equities, left.name, right.name, order)
-      fs[i] = res$F
-      ps[i] = res$P
-      i = i+1
+      if(!is.null(res)) {
+        i = i+1
+        fs[i] = res$F
+        ps[i] = res$P
+      }
       lefts[i] = right.name
       rights[i] = left.name
       res = granger.fp(equities, right.name, left.name, order)
-      fs[i] = res$F
-      ps[i] = res$P      
+      if(!is.null(res)) {
+        i = i+1
+        fs[i] = res$F
+        ps[i] = res$P
+      }
     }
   }
   return(data.frame(left=lefts, right=rights, F=fs, P=ps))
