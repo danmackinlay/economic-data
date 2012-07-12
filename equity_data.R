@@ -18,7 +18,9 @@ get.favourite.indices = function (limit=10) {
   
     if(!(ticker.name %in% favourite.equities.ticker.names)) {next}
     if(i>limit) {break}
-    print(ticker.name)
+    
+    i=i+1
+    
     append(equity.tickers, ticker.name)
   
     one.equity = read.csv(gzfile(paste(base.path, file.name, sep = "")))
