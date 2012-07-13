@@ -2,6 +2,7 @@
 # though the former is better for pairwise tables
 #library("MSBVAR")
 library("lmtest")
+#library("ggplot2")
 
 base.path = '/Users/dan/Dropbox/trade_data/cache/'
 
@@ -46,7 +47,7 @@ get.ts = function(equities, ticker.name) {
   return(zoo(equities[,ticker.name], equities$Date))
 }
 
-granger.fp = function(data, xname, yname, order){
+granger.fp = function(xname, yname, data, order=1){
   res = NULL
   error = try(res <- grangertest(data[,xname], data[,yname], order=order))
   if(is.null(res)) return(list(F=NA,P=NA,worked=FALSE))
@@ -54,6 +55,17 @@ granger.fp = function(data, xname, yname, order){
   p = res[2, "Pr(>F)"]
   return(list(F=f, P=p, worked=TRUE))
 }
+vec.granger.fp = Vectorize(granger.fp, vectorize.args=c('xname', 'yname'))
+
+granger.p = function(xname, yname, data, order=1){
+  return(as.numeric(granger.fp(xname, yname, data, order)['P']))
+}
+vec.granger.p = Vectorize(granger.p, vectorize.args=c('xname', 'yname'))
+
+granger.f = function(xname, yname, data, order=1){
+  return(as.numeric(granger.fp(xname, yname, data, order)['F']))
+}
+vec.granger.f = Vectorize(granger.f, vectorize.args=c('xname', 'yname'))
 
 pairwise.granger.test = function(equities, order=1) {
   equity.names = names(equities)[-1]
@@ -65,18 +77,19 @@ pairwise.granger.test = function(equities, order=1) {
   fs = vector(mode='numeric', length = n.pairs)
   ps = vector(mode='numeric', length = n.pairs)
   i = 0
+  
   for(j in 1:(n-1)) {
     for(k in (j+1):(n)) {
       left.name = equity.names[j]
       right.name = equity.names[k]
       print(c(left.name, right.name))
-      res = granger.fp(equities, left.name, right.name, order)
+      res = granger.fp(left.name, right.name, equities, order)
       i = i+1
       lefts[i] = left.name
       rights[i] = right.name
       fs[i] = res$F
       ps[i] = res$P
-      res = granger.fp(equities, right.name, left.name, order)
+      res = granger.fp(right.name, left.name, equities, order)
       i = i+1
       lefts[i] = right.name
       rights[i] = left.name
@@ -85,4 +98,11 @@ pairwise.granger.test = function(equities, order=1) {
     }
   }
   return(data.frame(left=as.factor(lefts), right=as.factor(rights), F=fs, P=ps))
+}
+
+pairwise.granger.test.m = function(equities, order=1) {
+  x = names(equities)[-1]
+  names(x) = x
+  y = x
+  return(outer(x, y, vec.granger.f, equities))
 }
