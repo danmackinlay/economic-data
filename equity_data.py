@@ -5,6 +5,9 @@ http://www.asx.com.au/asx/research/companyInfo.do
 Here is the format of Yahoo Finance downloads by category:
 http://ichart.finance.yahoo.com/table.csv?d=6&e=1&f=2012&g=d&a=7&b=19&c=2003&ignore=.csv&s=ASX.AX
 
+Here is some implicit documentation of the API:
+http://stackoverflow.com/a/2078411
+
 TODO:
 
 * Think about foriegn exchanges' data, not just ASX

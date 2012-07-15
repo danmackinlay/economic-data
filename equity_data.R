@@ -67,6 +67,10 @@ granger.f = function(xname, yname, data, order=1){
 }
 vec.granger.f = Vectorize(granger.f, vectorize.args=c('xname', 'yname'))
 
+#Need to cast this to a p/f matrix
+#try:
+# http://stackoverflow.com/a/9617424
+# http://tolstoy.newcastle.edu.au/R/e6/help/09/01/0598.html
 pairwise.granger.test = function(equities, order=1) {
   equity.names = names(equities)[-1]
   n = length(equity.names)
