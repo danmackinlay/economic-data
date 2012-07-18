@@ -1,8 +1,13 @@
 # Two granger libraries - we use the latter because it has missing value handling baked in,
-# though the former is better for pairwise tables
+# though the former is better for vectorised correlations
+# Note that neither support true multivariate calculations, just pairwise.
 #library("MSBVAR")
 library("lmtest")
-#library("ggplot2")
+library(ggplot2)
+library(reshape2)
+library(ggdendro)
+
+
 
 base.path = '/Users/dan/Dropbox/trade_data/cache/'
 
@@ -109,4 +114,34 @@ pairwise.granger.test.m = function(equities, order=1) {
   names(x) = x
   y = x
   return(outer(x, y, vec.granger.f, equities))
+}
+
+#To see how to do this, try...
+#  Traditional:
+#    http://flowingdata.com/2010/01/21/how-to-make-a-heatmap-a-quick-and-easy-solution/
+#    http://sphaerula.com/legacy/R/correlationPlot.html
+#    http://www.phaget4.org/R/image_matrix.html
+#  ggplot2:
+#    https://learnr.wordpress.com/2010/01/26/ggplot2-quick-heatmap-plotting/
+#    http://stackoverflow.com/a/5554352
+#    http://stackoverflow.com/a/6675983 (bonus dendrogram!)
+#    http://hosho.ees.hokudai.ac.jp/~kubo/Rdoc/library/ggmap/html/ggimage.html
+#  general community structure:
+#    http://sieste.wordpress.com/2012/05/21/inferring-the-community-structure-of-networks/
+#    http://cran.cnr.berkeley.edu/web/views/Cluster.html
+#
+# linkcomm seems to do this for weighted digraphs.
+# agnes (from cluster) doesn't like missing values, hclust (from stats) might be OK with 'em, but it isn't clear
+# Here is an R GEXF gephi exporter (although a CSV export will probably do the trick)
+# Drew conway chatter on the issue: http://www.drewconway.com/zia/?p=1221
+# For a combo version, use the r heatmap plot with bonus dendrogram
+#   heatmap(favourite.pairwise.vals)
+#   more general clustering is in PDM, cluster, et al
+# Sorting each axis separately might be informative enough without getting overexcited about directed graphs. 
+# probably it can all go into SQL anyway
+# For SQL, gephi likes nodes and edges in separate tables -  "id", "source", "target", "weight"
+
+
+plot.correlation.matrix = function(correlations){
+  
 }
