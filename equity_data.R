@@ -8,12 +8,15 @@ library("reshape2")
 library("ggdendro")
 library("RSQLite")
 
+# example usage:
+# equities = pairwise.granger.test(get.favourite.indices(limit=Inf))
+# #equities.m = pairwise.granger.test.m(get.favourite.indices(limit=Inf))
+
 
 base.path = '/Users/dan/Dropbox/trade_data'
 cache.path = paste(base.path, "cache", sep="/")
 
-get.favourite.indices = function (limit=10) {
-
+get.favourite.equities = function (limit=10) {
   files = list.files(cache.path, pattern=".*\\.csv\\.gz")
   favourite.equities.ticker.names = c('AAI', 'AAT', 'AAU', 'AAY', 'AEF', 'AGK', 'AIZ', 'ALL', 'AMP', 'ANN', 'ANZ', 'APD', 'APN', 'APP', 'AQF', 'ARG', 'ASX', 'AVH', 'BBG', 'BEN', 'BGA', 'BHP', 'BKL', 'BOQ', 'BXB', 'CBA', 'CCL', 'CCV', 'CER', 'CLO', 'CLX', 'CMJ', 'CNG', 'CRF', 'CSR', 'CTY', 'CWN', 'CYU', 'DJS', 'DMP', 'EAU', 'ELD', 'FLT', 'FMG', 'FPA', 'FPH', 'FXJ', 'GDA', 'GEM', 'GFF', 'GMG', 'HRL', 'HVN', 'IFL', 'IFM', 'ION', 'JBH', 'JET', 'KMD', 'LCT', 'LMW', 'MGI', 'MGM', 'MGR', 'MIX', 'MQG', 'MUE', 'MXU', 'MYR', 'NAB', 'NCM', 'NVT', 'NWS', 'OEC', 'OMI', 'ORD', 'ORG', 'ORI', 'OST', 'PBG', 'PHG', 'PNW', 'QAN', 'QBE', 'QRN', 'RRS', 'RUM', 'SBK', 'SGH', 'SGP', 'SGT', 'SIP', 'SKC', 'SKT', 'SOL', 'SUN', 'SWM', 'SXL', 'SYD', 'TAH', 'TEL', 'TEN', 'TIS', 'TLS', 'TPC', 'TRS', 'TSE', 'TTS', 'VEI', 'VEL', 'VRL', 'VSC', 'VTG', 'WBC', 'WDC', 'WEB', 'WES', 'WFA', 'WFT', 'WOW', 'WRT', 'WSF', 'WTF', 'WWM', 'ZBI', 'ZRI')
   i=0
@@ -90,6 +93,7 @@ pairwise.granger.test = function(equities, order=1) {
   ps = vector(mode='numeric', length = n.pairs)
   i = 0
   
+  #danger! this ignores the asymmetry of the relation!
   for(j in 1:(n-1)) {
     for(k in (j+1):(n)) {
       left.name = equity.names[j]
@@ -112,6 +116,8 @@ pairwise.granger.test = function(equities, order=1) {
   return(data.frame(left=as.factor(lefts), right=as.factor(rights), F=fs, P=ps))
 }
 
+# returns a pairwise granger-causality distance matrix
+# Need to cast this to and from sparse p/f frames
 pairwise.granger.test.m = function(equities, order=1) {
   x = names(equities)[-1]
   names(x) = x
@@ -147,4 +153,48 @@ plot.correlation.matrix = function(correlations){
   
 }
 
-# For SQL, gephi likes nodes and edges in separate tables -  "id", "source", "target", "weight"
+# For SQL, gephi likes nodes and edges in separate tables - 
+# Edges:
+# "source", "target", "label", "weight"
+# Nodes:
+# "id", "label", "x, "y", "size"
+# For both of these we can add "start" and "end" to dynamic graphs
+
+# Convert a sparse pairwise correlation frame into a weighted, directed,
+# SQL graph
+correlation.to.sql = function(data, dbname="equities_graph.db") {
+  conn <- dbConnect("SQLite", dbname = paste(base.path, dbname, sep="/"))
+
+  ## The interface can work at a higher level importing tables 
+  ## as data.frames and exporting data.frames as DBMS tables.
+
+  dbListTables(con)
+  dbListFields(con, "quakes")
+  if(dbExistsTable(con, "new_results"))
+    dbRemoveTable(con, "new_results")
+  dbWriteTable(con, "new_results", new.output)
+  
+  ## The interface allows lower-level interface to the DBMS
+  res <- dbSendQuery(con, paste(
+    "SELECT g.id, g.mirror, g.diam, e.voltage",
+    "FROM geom_table as g, elec_measures as e",
+    "WHERE g.id = e.id and g.mirrortype = 'inside'",
+    "ORDER BY g.diam"))
+  out <- NULL
+  while(!dbHasCompleted(res)){
+    chunk <- fetch(res, n = 10000)
+    out <- c(out, doit(chunk))
+  }
+
+  ## Free up resources
+  dbClearResult(res)
+  dbDisconnect(con)
+  dbUnloadDriver(drv)
+
+  rs <- dbSendQuery(con, statement = paste(
+    "SELECT w.laser_id, w.wavelength, p.cut_off",
+    "FROM WL w, PURGE P",
+    "WHERE w.laser_id = p.laser_id", 
+    "SORT BY w.laser_id"))
+  data <- fetch(rs, n = -1)   # extract all rows                  
+}
