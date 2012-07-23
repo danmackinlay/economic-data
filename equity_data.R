@@ -3,9 +3,9 @@
 # Note that neither support true multivariate calculations, just pairwise.
 #library("MSBVAR")
 library("lmtest")
-library("ggplot2")
+#library("ggplot2")
 library("reshape2")
-library("ggdendro")
+#library("ggdendro")
 library("RSQLite")
 
 # example usage:
