@@ -44,9 +44,10 @@ get.favourite.indices = function (limit=10) {
   return(equities)
 }
 
-# this looks like it should go, formula style.
+# This looks like it should go formula style.
 # grangertest(AAT ~ AAY, data=equities)
-# so we go for time series
+# but constructing formulae in code is tedious,
+# so we pass time series directly
 
 get.ts = function(equities, ticker.name) {
   return(zoo(equities[,ticker.name], equities$Date))
@@ -72,7 +73,8 @@ granger.f = function(xname, yname, data, order=1){
 }
 vec.granger.f = Vectorize(granger.f, vectorize.args=c('xname', 'yname'))
 
-#Need to cast this to a p/f matrix
+# returns a "melted" pairwise granger-causality distance frame
+#Need to cast this to and from p/f matrices
 #try:
 # http://stackoverflow.com/a/9617424
 # http://tolstoy.newcastle.edu.au/R/e6/help/09/01/0598.html
@@ -139,9 +141,9 @@ pairwise.granger.test.m = function(equities, order=1) {
 #   more general clustering is in PDM, cluster, et al
 # Sorting each axis separately might be informative enough without getting overexcited about directed graphs. 
 # probably it can all go into SQL anyway
-# For SQL, gephi likes nodes and edges in separate tables -  "id", "source", "target", "weight"
-
 
 plot.correlation.matrix = function(correlations){
   
 }
+
+# For SQL, gephi likes nodes and edges in separate tables -  "id", "source", "target", "weight"
