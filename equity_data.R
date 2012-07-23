@@ -93,9 +93,8 @@ pairwise.granger.test = function(equities, order=1) {
   ps = vector(mode='numeric', length = n.pairs)
   i = 0
   
-  #danger! this ignores the asymmetry of the relation!
-  for(j in 1:(n-1)) {
-    for(k in (j+1):(n)) {
+  for(j in 1:n) {
+    for(k in (1:n)[-j]) {
       left.name = equity.names[j]
       right.name = equity.names[k]
       print(c(left.name, right.name))
@@ -103,12 +102,6 @@ pairwise.granger.test = function(equities, order=1) {
       i = i+1
       lefts[i] = left.name
       rights[i] = right.name
-      fs[i] = res$F
-      ps[i] = res$P
-      res = granger.fp(right.name, left.name, equities, order)
-      i = i+1
-      lefts[i] = right.name
-      rights[i] = left.name
       fs[i] = res$F
       ps[i] = res$P
     }
