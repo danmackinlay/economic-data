@@ -10,14 +10,15 @@ http://stackoverflow.com/a/2078411
 
 TODO:
 
-* Think about foriegn exchanges' data, not just ASX
-* what to do with missing data (so far, only companies that did not yet exist or folded)
-* gzip data to save space
+* Think about foreign exchanges' data, not just ASX
 * return just a 2-column data set.
 * how to represent dates? Ints, preferably.
 * check response code and discard stuff that is just an error message
 * put firm data in an SQLite database
+* put exp metadata in the database
 * thence, scale node sizes by market capitalisation
+* check difference from k-lag
+* colour nodes by sector
 """
 
 import requests
