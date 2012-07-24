@@ -152,13 +152,17 @@ plot.correlation.matrix = function(correlations){
 # Nodes:
 # "id", "label", "x, "y", "size"
 # For both of these we can add "start" and "end" to dynamic graphs
+# here we respect the "source", "target" and "id" names but will use
+# SELECT AS to coerce the remainder
 
 # Convert a sparse pairwise correlation frame into a weighted, directed,
 # SQL graph
-correlations.to.sql = function(data, dbname="equities_graph.db") {
+correlations.to.sql = function(data, dbname="equities_graph.db", max.p=0.1) {
   conn <- dbConnect("SQLite", dbname = paste(base.path, dbname, sep="/"))
   
   data = data[!is.na(data$P),]
+  data = data[data$P<max.p,]
+  
   node.names = data.frame(id=unique(equities$source))
   dbWriteTable(conn, "nodes", node.names)
   
