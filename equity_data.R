@@ -157,7 +157,10 @@ plot.correlation.matrix = function(correlations){
 
 # Convert a sparse pairwise correlation frame into a weighted, directed,
 # SQL graph
-correlations.to.sql = function(data, dbname="equities_graph.db", max.p=0.1) {
+# Gephi can interpret this using the folloing nodes/edges queries respectively
+# SELECT id, id AS "label" FROM nodes
+# SELECT source, target, f AS "weight" FROM edges
+correlations.to.sql = function(data, dbname="equities_graph.db", max.p=0.05) {
   dbpath = paste(base.path, dbname, sep="/")
   print(c("opening", dbpath))
   conn <- dbConnect("SQLite", dbname = dbpath)

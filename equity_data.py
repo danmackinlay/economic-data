@@ -16,6 +16,8 @@ TODO:
 * return just a 2-column data set.
 * how to represent dates? Ints, preferably.
 * check response code and discard stuff that is just an error message
+* put firm data in an SQLite database
+* thence, scale node sizes by market capitalisation
 """
 
 import requests
