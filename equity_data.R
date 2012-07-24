@@ -87,26 +87,26 @@ pairwise.granger.test = function(equities, order=1) {
   n = length(equity.names)
   n.pairs = n*(n-1)
   relations = data.frame
-  lefts = vector(mode='character', length = n.pairs)
-  rights = vector(mode='character', length = n.pairs)
+  sources = vector(mode='character', length = n.pairs)
+  targets = vector(mode='character', length = n.pairs)
   fs = vector(mode='numeric', length = n.pairs)
   ps = vector(mode='numeric', length = n.pairs)
   i = 0
   
   for(j in 1:n) {
     for(k in (1:n)[-j]) {
-      left.name = equity.names[j]
-      right.name = equity.names[k]
-      print(c(left.name, right.name))
-      res = granger.fp(left.name, right.name, equities, order)
+      source.name = equity.names[j]
+      target.name = equity.names[k]
+      print(c(source.name, target.name))
+      res = granger.fp(source.name, target.name, equities, order)
       i = i+1
-      lefts[i] = left.name
-      rights[i] = right.name
+      sources[i] = source.name
+      targets[i] = target.name
       fs[i] = res$F
       ps[i] = res$P
     }
   }
-  return(data.frame(left=as.factor(lefts), right=as.factor(rights), F=fs, P=ps))
+  return(data.frame(source=as.factor(sources), target=as.factor(targets), F=fs, P=ps))
 }
 
 # returns a pairwise granger-causality distance matrix
@@ -155,39 +155,21 @@ plot.correlation.matrix = function(correlations){
 
 # Convert a sparse pairwise correlation frame into a weighted, directed,
 # SQL graph
-correlation.to.sql = function(data, dbname="equities_graph.db") {
+correlations.to.sql = function(data, dbname="equities_graph.db") {
   conn <- dbConnect("SQLite", dbname = paste(base.path, dbname, sep="/"))
-
-  ## The interface can work at a higher level importing tables 
-  ## as data.frames and exporting data.frames as DBMS tables.
-
-  dbListTables(con)
-  dbListFields(con, "quakes")
-  if(dbExistsTable(con, "new_results"))
-    dbRemoveTable(con, "new_results")
-  dbWriteTable(con, "new_results", new.output)
   
-  ## The interface allows lower-level interface to the DBMS
-  res <- dbSendQuery(con, paste(
-    "SELECT g.id, g.mirror, g.diam, e.voltage",
-    "FROM geom_table as g, elec_measures as e",
-    "WHERE g.id = e.id and g.mirrortype = 'inside'",
-    "ORDER BY g.diam"))
-  out <- NULL
-  while(!dbHasCompleted(res)){
-    chunk <- fetch(res, n = 10000)
-    out <- c(out, doit(chunk))
-  }
+  data = data[!is.na(data$P),]
+  node.names = data.frame(id=unique(equities$source))
+  dbWriteTable(conn, "nodes", node.names)
+  
+  dbWriteTable(conn, "edges_f", data)
+}
 
-  ## Free up resources
-  dbClearResult(res)
-  dbDisconnect(con)
-  dbUnloadDriver(drv)
-
-  rs <- dbSendQuery(con, statement = paste(
-    "SELECT w.laser_id, w.wavelength, p.cut_off",
-    "FROM WL w, PURGE P",
-    "WHERE w.laser_id = p.laser_id", 
-    "SORT BY w.laser_id"))
-  data <- fetch(rs, n = -1)   # extract all rows                  
+# Convert a weighted, directed, SQL graph into a sparse pairwise
+# correlation frame
+sql.to.correlations = function(dbname="equities_graph.db",
+      q = "SELECT * from edges") {
+  conn <- dbConnect("SQLite", dbname = paste(base.path, dbname, sep="/"))
+  return(dbGetQuery(conn, q))
+  
 }
