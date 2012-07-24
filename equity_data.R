@@ -158,22 +158,27 @@ plot.correlation.matrix = function(correlations){
 # Convert a sparse pairwise correlation frame into a weighted, directed,
 # SQL graph
 correlations.to.sql = function(data, dbname="equities_graph.db", max.p=0.1) {
-  conn <- dbConnect("SQLite", dbname = paste(base.path, dbname, sep="/"))
+  dbpath = paste(base.path, dbname, sep="/")
+  print(c("opening", dbpath))
+  conn <- dbConnect("SQLite", dbname = dbpath)
   
   data = data[!is.na(data$p),]
   data = data[data$p<max.p,]
+  node.names = data.frame(id=unique(data$source))
   
-  node.names = data.frame(id=unique(equities$source))
   dbWriteTable(conn, "nodes", node.names)
-  
-  dbWriteTable(conn, "edges_f", data)
+  dbWriteTable(conn, "edges", data)
+  dbDisconnect(conn)
 }
 
 # Convert a weighted, directed, SQL graph into a sparse pairwise
 # correlation frame
 sql.to.correlations = function(dbname="equities_graph.db",
       q = "SELECT * from edges") {
-  conn <- dbConnect("SQLite", dbname = paste(base.path, dbname, sep="/"))
-  return(dbGetQuery(conn, q))
-  
+  dbpath = paste(base.path, dbname, sep="/")
+  print(c("opening", dbpath))
+  conn <- dbConnect("SQLite", dbname = dbpath)
+  res = dbGetQuery(conn, q)
+  dbDisconnect(conn)
+  return(res)
 }
