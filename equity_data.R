@@ -60,20 +60,20 @@ get.ts = function(equities, ticker.name) {
 granger.fp = function(xname, yname, data, order=1){
   res = NULL
   error = try(res <- grangertest(data[,xname], data[,yname], order=order))
-  if(is.null(res)) return(list(F=NA,P=NA,worked=FALSE))
-  f = res[2, "F"]
+  if(is.null(res)) return(list(f=NA,p=NA,worked=FALSE))
+  f = res[2, "f"]
   p = res[2, "Pr(>F)"]
-  return(list(F=f, P=p, worked=TRUE))
+  return(list(f=f, p=p, worked=TRUE))
 }
 vec.granger.fp = Vectorize(granger.fp, vectorize.args=c('xname', 'yname'))
 
 granger.p = function(xname, yname, data, order=1){
-  return(as.numeric(granger.fp(xname, yname, data, order)['P']))
+  return(as.numeric(granger.fp(xname, yname, data, order)['p']))
 }
 vec.granger.p = Vectorize(granger.p, vectorize.args=c('xname', 'yname'))
 
 granger.f = function(xname, yname, data, order=1){
-  return(as.numeric(granger.fp(xname, yname, data, order)['F']))
+  return(as.numeric(granger.fp(xname, yname, data, order)['f']))
 }
 vec.granger.f = Vectorize(granger.f, vectorize.args=c('xname', 'yname'))
 
@@ -102,11 +102,11 @@ pairwise.granger.test = function(equities, order=1) {
       i = i+1
       sources[i] = source.name
       targets[i] = target.name
-      fs[i] = res$F
-      ps[i] = res$P
+      fs[i] = res$f
+      ps[i] = res$p
     }
   }
-  return(data.frame(source=as.factor(sources), target=as.factor(targets), F=fs, P=ps))
+  return(data.frame(source=as.factor(sources), target=as.factor(targets), f=fs, p=ps))
 }
 
 # returns a pairwise granger-causality distance matrix
@@ -160,8 +160,8 @@ plot.correlation.matrix = function(correlations){
 correlations.to.sql = function(data, dbname="equities_graph.db", max.p=0.1) {
   conn <- dbConnect("SQLite", dbname = paste(base.path, dbname, sep="/"))
   
-  data = data[!is.na(data$P),]
-  data = data[data$P<max.p,]
+  data = data[!is.na(data$p),]
+  data = data[data$p<max.p,]
   
   node.names = data.frame(id=unique(equities$source))
   dbWriteTable(conn, "nodes", node.names)
