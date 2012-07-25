@@ -48,7 +48,8 @@ get.equities = function (limit=10, limit.to=NA) {
       
     one.equity = read.csv(gzfile(paste(cache.path, file.name, sep = "/")))
     trimmed.equity = one.equity[c("Date")]
-    #take max because some shares still trade at 0 (granularity is $0.01, zero is -4.61)
+    # take max because some shares still trade at 0
+    # (granularity is $0.01, zero is -4.61)
     trimmed.equity[ticker.name] = log(pmax(
       one.equity["Adj.Close"],
       0.005))
@@ -121,7 +122,8 @@ pairwise.granger.test = function(equities, order=1) {
       ps[i] = res$p
     }
   }
-  return(data.frame(source=as.factor(sources), target=as.factor(targets), f=fs, p=ps))
+  return(data.frame(source=as.factor(sources), target=as.factor(targets),
+                    f=fs, p=ps))
 }
 
 # returns a pairwise granger-causality distance matrix
@@ -133,7 +135,7 @@ pairwise.granger.test.m = function(equities, order=1) {
   return(outer(x, y, vec.granger.f, equities))
 }
 
-#To see how to do this, try...
+# To see how to do this, try...
 #  Traditional:
 #    http://flowingdata.com/2010/01/21/how-to-make-a-heatmap-a-quick-and-easy-solution/
 #    http://sphaerula.com/legacy/R/correlationPlot.html
@@ -148,14 +150,17 @@ pairwise.granger.test.m = function(equities, order=1) {
 #    http://cran.cnr.berkeley.edu/web/views/Cluster.html
 #
 # linkcomm seems to do this for weighted digraphs.
-# agnes (from cluster) doesn't like missing values, hclust (from stats) might be OK with 'em, but it isn't clear
-# Here is an R GEXF gephi exporter (although a CSV export will probably do the trick)
+# agnes (from cluster) doesn't like missing values, hclust (from stats)
+#    might be OK with 'em, but it isn't clear
+# Here is an R GEXF gephi exporter (although a CSV export will probably do
+#   the trick)
 # Drew conway chatter on the issue: http://www.drewconway.com/zia/?p=1221
 # For a combo version, use the r heatmap plot with bonus dendrogram
 #   heatmap(favourite.pairwise.vals)
 #   more general clustering is in PDM, cluster, et al
-# Sorting each axis separately might be informative enough without getting overexcited about directed graphs. 
-# probably it can all go into SQL anyway
+# Sorting each axis separately might be informative enough without getting
+#   overexcited about directed graphs. 
+# Probably it can all go into SQL anyway
 
 plot.correlation.matrix = function(correlations){
   
@@ -172,7 +177,8 @@ plot.correlation.matrix = function(correlations){
 
 # Convert a sparse pairwise correlation frame into a weighted, directed,
 # SQL graph
-# Gephi can interpret this using the folloing nodes/edges queries respectively
+# Gephi can interpret this using the folloing nodes/edges queries
+# respectively
 # SELECT id, id AS "label" FROM nodes
 # SELECT source, target, f AS "weight" FROM edges
 correlations.to.sql = function(data, dbname="equities_graph.db", max.p=0.05) {
