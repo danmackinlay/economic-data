@@ -74,9 +74,9 @@ get.ts = function(equities, ticker.name) {
   return(zoo(equities[,ticker.name], equities$Date))
 }
 
-granger.fp = function(xname, yname, data, order=1){
+granger.fp = function(xname, yname, data, k=1){
   res = NULL
-  error = try(res <- grangertest(data[,xname], data[,yname], order=order))
+  error = try(res <- grangertest(data[,xname], data[,yname], order=k))
   if(is.null(res)) return(list(f=NA,p=NA,worked=FALSE))
   f = res[2, "f"]
   p = res[2, "Pr(>F)"]
@@ -84,13 +84,13 @@ granger.fp = function(xname, yname, data, order=1){
 }
 vec.granger.fp = Vectorize(granger.fp, vectorize.args=c('xname', 'yname'))
 
-granger.p = function(xname, yname, data, order=1){
-  return(as.numeric(granger.fp(xname, yname, data, order)['p']))
+granger.p = function(xname, yname, data, k=1){
+  return(as.numeric(granger.fp(xname, yname, data, k)['p']))
 }
 vec.granger.p = Vectorize(granger.p, vectorize.args=c('xname', 'yname'))
 
-granger.f = function(xname, yname, data, order=1){
-  return(as.numeric(granger.fp(xname, yname, data, order)['f']))
+granger.f = function(xname, yname, data, k=1){
+  return(as.numeric(granger.fp(xname, yname, data, k)['f']))
 }
 vec.granger.f = Vectorize(granger.f, vectorize.args=c('xname', 'yname'))
 
@@ -99,7 +99,7 @@ vec.granger.f = Vectorize(granger.f, vectorize.args=c('xname', 'yname'))
 #try:
 # http://stackoverflow.com/a/9617424
 # http://tolstoy.newcastle.edu.au/R/e6/help/09/01/0598.html
-pairwise.granger.test = function(equities, order=1) {
+pairwise.granger.test = function(equities, k=1) {
   equity.names = names(equities)[-1]
   n = length(equity.names)
   n.pairs = n*(n-1)
@@ -115,7 +115,7 @@ pairwise.granger.test = function(equities, order=1) {
       source.name = equity.names[j]
       target.name = equity.names[k]
       print(c(source.name, target.name))
-      res = granger.fp(source.name, target.name, equities, order)
+      res = granger.fp(source.name, target.name, equities, k)
       i = i+1
       sources[i] = source.name
       targets[i] = target.name
@@ -129,7 +129,7 @@ pairwise.granger.test = function(equities, order=1) {
 
 # returns a pairwise granger-causality distance matrix
 # Need to cast this to and from sparse p/f frames
-pairwise.granger.test.m = function(equities, order=1) {
+pairwise.granger.test.m = function(equities, k=1) {
   x = names(equities)[-1]
   names(x) = x
   y = x
