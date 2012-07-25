@@ -16,7 +16,7 @@ library("RSQLite")
 base.path = '/Users/dan/Dropbox/trade_data'
 cache.path = paste(base.path, "cache", sep="/")
 
-get.favourite.equities = function (limit=10) {
+get.favourite.equities = function (limit=Inf) {
   return get.equities(limit=limit, limit.to=c('AAI', 'AAT', 'AAU', 'AAY',
       'AEF', 'AGK', 'AIZ', 'ALL', 'AMP', 'ANN', 'ANZ', 'APD', 'APN', 'APP',
       'AQF', 'ARG', 'ASX', 'AVH', 'BBG', 'BEN', 'BGA', 'BHP', 'BKL', 'BOQ',
@@ -32,7 +32,7 @@ get.favourite.equities = function (limit=10) {
       'WDC', 'WEB', 'WES', 'WFA', 'WFT', 'WOW', 'WRT', 'WSF', 'WTF', 'WWM',
       'ZBI', 'ZRI'))
 }
-get.equities = function (limit=10, limit.to=NA) {
+get.equities = function (limit=Inf, limit.to=NA) {
   files = list.files(cache.path, pattern=".*\\.csv\\.gz")
   i=0
 
