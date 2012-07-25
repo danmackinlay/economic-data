@@ -48,7 +48,7 @@ get.equities = function (limit=Inf, limit.to=NA) {
   return(equities)
 }
 get.favourite.equities = function (limit=Inf) {
-  return get.equities(limit=limit, limit.to=c('AAI', 'AAT', 'AAU', 'AAY',
+  return(get.equities(limit=limit, limit.to=c('AAI', 'AAT', 'AAU', 'AAY',
     'AEF', 'AGK', 'AIZ', 'ALL', 'AMP', 'ANN', 'ANZ', 'APD', 'APN', 'APP',
     'AQF', 'ARG', 'ASX', 'AVH', 'BBG', 'BEN', 'BGA', 'BHP', 'BKL', 'BOQ',
     'BXB', 'CBA', 'CCL', 'CCV', 'CER', 'CLO', 'CLX', 'CMJ', 'CNG', 'CRF',
@@ -61,7 +61,7 @@ get.favourite.equities = function (limit=Inf) {
     'SOL', 'SUN', 'SWM', 'SXL', 'SYD', 'TAH', 'TEL', 'TEN', 'TIS', 'TLS',
     'TPC', 'TRS', 'TSE', 'TTS', 'VEI', 'VEL', 'VRL', 'VSC', 'VTG', 'WBC',
     'WDC', 'WEB', 'WES', 'WFA', 'WFT', 'WOW', 'WRT', 'WSF', 'WTF', 'WWM',
-    'ZBI', 'ZRI'))
+    'ZBI', 'ZRI')))
 }
 
 
