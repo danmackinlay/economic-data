@@ -12,7 +12,7 @@ library("RSQLite")
 # equities = pairwise.granger.test(get.favourite.equities(limit=Inf))
 # #equities.m = pairwise.granger.test.m(get.favourite.equities(limit=Inf))
 
-favourite.equities = c('AAI', 'AAT', 'AAU', 'AAY',
+favourite.equity.tickers = c('AAI', 'AAT', 'AAU', 'AAY',
   'AEF', 'AGK', 'AIZ', 'ALL', 'AMP', 'ANN', 'ANZ', 'APD', 'APN', 'APP',
   'AQF', 'ARG', 'ASX', 'AVH', 'BBG', 'BEN', 'BGA', 'BHP', 'BKL', 'BOQ',
   'BXB', 'CBA', 'CCL', 'CCV', 'CER', 'CLO', 'CLX', 'CMJ', 'CNG', 'CRF',
@@ -62,7 +62,7 @@ get.equities = function (limit=Inf, limit.to=NA) {
   return(equities)
 }
 get.favourite.equities = function (limit=Inf) {
-  return(get.equities(limit=limit, limit.to=favourite.equities))
+  return(get.equities(limit=limit, favourite.equity.tickers))
 }
 
 
