@@ -79,7 +79,7 @@ granger.fp = function(xname, yname, data, k=1){
   res = NULL
   error = try(res <- grangertest(data[,xname], data[,yname], order=k))
   if(is.null(res)) return(list(f=NA,p=NA,worked=FALSE))
-  f = res[2, "f"]
+  f = res[2, "F"]
   p = res[2, "Pr(>F)"]
   return(list(f=f, p=p, worked=TRUE))
 }
