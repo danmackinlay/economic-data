@@ -189,7 +189,7 @@ correlations.to.sql = function(data, dbname="equities_graph.db", max.p=0.05) {
   print(c("opening", dbpath))
   conn <- dbConnect("SQLite", dbname = dbpath)
   
-  data = data[!is.na(data$p),]
+  data = data[!is.na(data$f),]
   data = data[data$p<max.p,]
   node.names = data.frame(id=unique(data$source))
   
