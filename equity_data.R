@@ -123,8 +123,10 @@ pairwise.granger.test = function(equities, k=1) {
       ps[i] = res$p
     }
   }
+  #store the order of the correlation as well
+  ks = rep(k, length(fs))
   return(data.frame(source=as.factor(sources), target=as.factor(targets),
-                    f=fs, p=ps))
+                    f=fs, p=ps, k=ks))
 }
 
 # returns a pairwise granger-causality distance matrix
