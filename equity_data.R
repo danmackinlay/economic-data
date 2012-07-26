@@ -118,12 +118,12 @@ pairwise.granger.test = function(equities, k=1) {
   targets = vector(mode='character', length = n.pairs)
   fs = vector(mode='numeric', length = n.pairs)
   ps = vector(mode='numeric', length = n.pairs)
+
   i = 0
-  
-  for(j in 1:n) {
-    for(k in (1:n)[-j]) {
-      source.name = equity.names[j]
-      target.name = equity.names[k]
+  for(x in 1:n) {
+    for(y in (1:n)[-x]) {
+      source.name = equity.names[x]
+      target.name = equity.names[y]
       print(c(source.name, target.name))
       res = granger.fp(source.name, target.name, equities, k)
       i = i+1
