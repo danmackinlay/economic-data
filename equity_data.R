@@ -28,10 +28,19 @@ favourite.equity.tickers = c('AAI', 'AAT', 'AAU', 'AAY',
   'ZBI', 'ZRI')
 
 base.path = '/Users/dan/Dropbox/trade_data'
-cache.path = paste(base.path, "cache", sep="/")
+csv.cache.path = paste(base.path, "csvcache", sep="/")
+r.state.path = paste(base.path, "Rstate", sep="/")
+
+get.state = function() {
+  load.image(paste(r.state.path,"RData", sep="/"))
+}
+
+put.state = function() {
+  save.image(paste(r.state.path,"RData", sep="/"))
+}
 
 get.equities = function (limit=Inf, limit.to=NA) {
-  files = list.files(cache.path, pattern=".*\\.csv\\.gz")
+  files = list.files(csv.cache.path, pattern=".*\\.csv\\.gz")
   i=0
 
   equities = NULL;
@@ -44,7 +53,7 @@ get.equities = function (limit=Inf, limit.to=NA) {
     
     i=i+1
       
-    one.equity = read.csv(gzfile(paste(cache.path, file.name, sep = "/")))
+    one.equity = read.csv(gzfile(paste(csv.cache.path, file.name, sep = "/")))
     trimmed.equity = one.equity[c("Date")]
     # take max because some shares still trade at 0
     # (granularity is $0.01, zero is -4.61)
