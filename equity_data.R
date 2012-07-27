@@ -9,8 +9,14 @@ library("reshape2")
 library("RSQLite")
 
 # example usage:
-# equities = pairwise.granger.test(get.favourite.equities(limit=Inf))
-# #equities.m = pairwise.granger.test.m(get.favourite.equities(limit=Inf))
+# favourite.equities = get.favourite.equities(limit=Inf)
+# #equities.m = pairwise.granger.test.m(favourite.equities)
+# relations.1 = pairwise.granger.test(favourite.equities, 1)
+# relations.2 = pairwise.granger.test(favourite.equities, 2)
+# relations.3 = pairwise.granger.test(favourite.equities, 3)
+# relations.all=rbind(relations.1,relations.2,relations.3)
+# put.state()
+
 
 favourite.equity.tickers = c('AAI', 'AAT', 'AAU', 'AAY',
   'AEF', 'AGK', 'AIZ', 'ALL', 'AMP', 'ANN', 'ANZ', 'APD', 'APN', 'APP',
