@@ -16,6 +16,7 @@ library("RSQLite")
 # relations.3 = pairwise.granger.test(favourite.equities, 3)
 # relations.all=rbind(relations.1,relations.2,relations.3)
 # put.state()
+# correlations.to.sql(relations.all)
 
 
 favourite.equity.tickers = c('AAI', 'AAT', 'AAU', 'AAY',
@@ -196,11 +197,12 @@ plot.correlation.matrix = function(correlations){
 
 # Convert a sparse pairwise correlation frame into a weighted, directed,
 # SQL graph
-# Gephi can interpret this using the folloing nodes/edges queries
+# Gephi can interpret this using the following nodes/edges queries
 # respectively
 # SELECT id, id AS "label" FROM nodes
-# SELECT source, target, f AS "weight" FROM edges
-correlations.to.sql = function(data, dbname="equities_graph.db", max.p=0.05) {
+# SELECT source, target, f AS "weight" FROM edges WHERE p<0.05 AND k=2
+# (Substitute your favourite p, k values)
+correlations.to.sql = function(data, dbname="equities_graph.db", max.p=1.0) {
   dbpath = paste(base.path, dbname, sep="/")
   print(c("opening", dbpath))
   conn <- dbConnect("SQLite", dbname = dbpath)
